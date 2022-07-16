@@ -20,7 +20,13 @@ def play():
       print(f'Game over: {outcome.result()} ({outcome.termination.name})')
       break
     if not turn & 1:
-      move = chess.Move.from_uci(input("Enter move: "))
+      instruction = input("Enter move: ")
+      if instruction in {'quit', 'resign'}:
+        break
+      move = chess.Move.from_uci(instruction)
+      if move not in board.legal_moves:
+        print("Invalid move.")
+        continue
       board.push(move)
     else:
       print("Computers Turn")
