@@ -11,7 +11,7 @@ from .knowledge_base import Kb
 
 
 try:
-  from IPython import display
+  import IPython
   def display_board(board, *args, size=390, **kwargs):
     """Displays a board drawn as an SVG."""
     svg = chess.svg.board(board, *args, size=size, **kwargs)
