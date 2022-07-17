@@ -18,12 +18,12 @@ except ModuleNotFoundError:
     print(board)
 
 
-def play():
+def play(white=bool(random.getrandbits(1))):
   """Creates a game simulation with the engine."""
-  
+
   board = chess.Board()
-  turn = 0
-  display_board(board)
+  turn = 0 if white else 1
+  display_board(board, flipped=not white)
   
   while True:
 
@@ -52,5 +52,5 @@ def play():
       board.push(move)
 
     # After any move, the board is displayed.
-    display_board(board)
+    display_board(board, flipped=not white)
     turn += 1
