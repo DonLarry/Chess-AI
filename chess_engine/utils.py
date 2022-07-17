@@ -1,6 +1,7 @@
 import chess
 import chess.svg
 import random
+import time
 from .minimax import minimax
 
 
@@ -33,6 +34,7 @@ def play():
 
     # On even turns, the person plays, on odd turns, the agent plays.
     if not turn & 1:
+      time.sleep(0.1)
       instruction = input("Enter move: ")
       if instruction in {'quit', 'resign'}:
         break
