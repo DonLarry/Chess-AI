@@ -26,7 +26,7 @@ except ModuleNotFoundError:
 def find_move(board, depth, white, kb: Optional[Kb]=None, moves: Optional[List[Move]]=None) -> Tuple[bool, int, Move]:
   """Finds the best possible move using a Knowledge Base if possible, or the minimax algorithm otherwise."""
 
-  if moves and kb:
+  if moves is not None and kb:
     move = kb.find_move(moves)
     if move:
       return True, 0, move
