@@ -46,7 +46,7 @@ def play(white=bool(random.getrandbits(1)), depth=3):
       board.push(move)
     else:
       print("Computers Turn")
-      evaluation, moves = minimax(board, depth, white=False)
+      evaluation, moves = minimax(board, depth, white=not white)
       move = random.choice(moves)
       print(f'Move: {move} (evaluation {evaluation})')
       board.push(move)
