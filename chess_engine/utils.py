@@ -1,8 +1,13 @@
-import chess
-import chess.svg
 import random
 import time
+from typing import List, Tuple, Optional
+
+import chess
+import chess.svg
+from chess import Move
+
 from .minimax import minimax
+from .knowledge_base import Kb
 
 
 try:
@@ -18,11 +23,27 @@ except ModuleNotFoundError:
     print(board)
 
 
+def find_move(board, depth, white, kb: Optional[Kb]=None, moves: Optional[List[Move]]=None) -> Tuple[bool, int, Move]:
+  """Finds the best possible move using a Knowledge Base if possible, or the minimax algorithm otherwise."""
+
+  if moves and kb:
+    move = kb.find_move(moves)
+    if move:
+      return True, 0, move
+
+  evaluation, moves = minimax(board, depth, white=not white)
+  move = random.choice(moves)
+  return False, evaluation, move
+
+
 def play(white=bool(random.getrandbits(1)), depth=3):
   """Creates a game simulation with the engine."""
 
   board = chess.Board()
+  kb = Kb()
+  moves = []
   turn = 0 if white else 1
+  using_kb = True
   display_board(board, flipped=not white)
   
   while True:
@@ -39,17 +60,20 @@ def play(white=bool(random.getrandbits(1)), depth=3):
       instruction = input("Enter move: ")
       if instruction in {'quit', 'resign', 'exit'}:
         break
-      move = chess.Move.from_uci(instruction)
+      move = Move.from_uci(instruction)
       if move not in board.legal_moves:
         print("Invalid move.")
         continue
-      board.push(move)
     else:
-      print("Computers Turn")
-      evaluation, moves = minimax(board, depth, white=not white)
-      move = random.choice(moves)
+      print("Computer's Turn")
+      in_kb, evaluation, move = find_move(board, depth, white, kb, moves)
+      if using_kb and not in_kb:
+        using_kb = False
+        kb = None
       print(f'Move: {move} (evaluation {evaluation})')
-      board.push(move)
+
+    board.push(move)
+    moves.append(move)
 
     # After any move, the board is displayed.
     display_board(board, flipped=not white)
