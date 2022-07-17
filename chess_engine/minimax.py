@@ -1,4 +1,4 @@
-# Se asignan valores para cada pieza, ya sea positivo o negativo según el color
+# Values are assigned for each piece, either positive or negative depending on the color.
 piece_value = {
   None: 0,
   'p': -10,
@@ -17,27 +17,32 @@ piece_value = {
 
 
 def evaluation(board):
-  """ Función de evaluación del tablero """
+  """Board evaluation function."""
+
   eval = 0
-  # Para todas las piezas presentes en el tablero se suman sus valores, dependiendo de la pieza y el color
-  # esto produce un número que representa la evaluación actual del tablero usada en el minimax.
+
+  # For all pieces present on the board, their values are added up, depending on the piece and color.
+  # This produces a number that represents the current evaluation of the board used in the minimax.
+
   for piece in board.piece_map().values():
     eval += piece_value[str(piece)]
+
   return eval
 
 
 def minimax(board, depth=3, alpha=-10000, beta=10000, white=True):
-  """ Implementación recursiva del algoritmo minimax """
-  # Se obtienen los movimientos posibles para el tablero actual
+  """Recursive implementation of the minimax algorithm."""
+
+  # The possible moves for the current board are obtained.
   legal_moves = [move for move in board.legal_moves]
 
-  # Al llegar a la profundidad deseada, se aplica la función de evaluación
+  # When the target depth is reached, the evaluation function is applied.
   if depth==0 or not legal_moves:
     return evaluation(board), []
 
   best_moves = []
 
-  # Se elige el criterio de comparación según el color de las piezas
+  # The comparison criterion is chosen according to the color of the pieces.
   if white:
     compare = lambda a, b: a > b
     best_eval = -9999
@@ -45,24 +50,26 @@ def minimax(board, depth=3, alpha=-10000, beta=10000, white=True):
     compare = lambda a, b: a < b
     best_eval = 9999
 
-  # Se corre el algoritmo con todos los movimientos posibles
+  # The algorithm is run with all the possible movements.
 
   for move in board.legal_moves:
-    # Se simula un movimiento en el tablero para calcular que beneficio aporta
+    # A move is simulated on the board to calculate what benefit it brings.
     board.push(move)
     current_eval, _ = minimax(board, depth-1, alpha, beta, not white)
-    # Se regresa el tablero al estado anterior, puesto que solo era una simulación
+
+    # The board is returned to the previous state, since it was only a simulation.
     board.pop()
 
-    # Se compara el beneficio del movimiento con el mejor hallado hasta el momento, con la esperanza de actualizar este último
+    # The benefit of the movement is compared with the best one found so far, in the hope of updating the latter.
     if compare(current_eval, best_eval):
       best_eval = current_eval
       best_moves = [move]
     elif current_eval == best_eval:
       best_moves.append(move)
 
-    # Aplicación de la poda alfa beta
+    # Alpha-beta pruning.
     alpha = max(alpha, current_eval)
     if beta <= alpha:
       break
+
   return best_eval, best_moves
