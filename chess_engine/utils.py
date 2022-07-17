@@ -1,14 +1,19 @@
 import chess
 import chess.svg
 import random
-import IPython
 from .minimax import minimax
 
 
-def display_board(board, *args, size=390, **kwargs):
-  """Displays a board drawn as an SVG."""
-  svg = chess.svg.board(board, *args, size=size, **kwargs)
-  display(IPython.display.HTML(svg))
+try:
+  from IPython import display
+  def display_board(board, *args, size=390, **kwargs):
+    """Displays a board drawn as an SVG."""
+    svg = chess.svg.board(board, *args, size=size, **kwargs)
+    display(IPython.display.HTML(svg))
+except ModuleNotFoundError:
+  def display_board(board, *args, **kwargs):
+    """Displays a board drawn as an ascii representation."""
+    print(board)
 
 
 def play():
