@@ -37,7 +37,7 @@ def play(white=bool(random.getrandbits(1))):
     if not turn & 1:
       time.sleep(0.1)
       instruction = input("Enter move: ")
-      if instruction in {'quit', 'resign'}:
+      if instruction in {'quit', 'resign', 'exit'}:
         break
       move = chess.Move.from_uci(instruction)
       if move not in board.legal_moves:
