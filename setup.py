@@ -7,7 +7,7 @@ setup(
     description='',
     url='https://github.com/DonLarry/Chess-AI',
     license='MIT License',
-    packages=['src'],
+    packages=['chess_engine'],
     install_requires=[
         'chess',
         'pyswip',
