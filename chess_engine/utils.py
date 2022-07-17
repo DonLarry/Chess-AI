@@ -14,6 +14,7 @@ try:
 except ModuleNotFoundError:
   def display_board(board, *args, **kwargs):
     """Displays a board drawn as an ascii representation."""
+    del args, kwargs
     print(board)
 
 
