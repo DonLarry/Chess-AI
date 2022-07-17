@@ -2,7 +2,7 @@ import chess
 import chess.svg
 import random
 import IPython
-from minimax import minimax
+from .minimax import minimax
 
 
 def display_board(board, *args, size=390, **kwargs):
