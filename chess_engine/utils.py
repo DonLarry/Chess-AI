@@ -23,11 +23,11 @@ except ModuleNotFoundError:
     print(board)
 
 
-def find_move(board, depth, white, kb: Optional[Kb]=None, moves: Optional[List[Move]]=None) -> Tuple[bool, int, Move]:
+def find_move(board, depth, white, kb: Optional[Kb]=None) -> Tuple[bool, int, Move]:
   """Finds the best possible move using a Knowledge Base if possible, or the minimax algorithm otherwise."""
 
-  if moves is not None and kb:
-    move = kb.find_move(moves)
+  if kb:
+    move = kb.find_move(board.fen())
     if move:
       return True, 0, move
 
@@ -41,7 +41,6 @@ def play(white=bool(random.getrandbits(1)), depth=3):
 
   board = chess.Board()
   kb = Kb()
-  moves = []
   turn = 0 if white else 1
   using_kb = True
   display_board(board, flipped=not white)
@@ -66,14 +65,13 @@ def play(white=bool(random.getrandbits(1)), depth=3):
         continue
     else:
       print("Computer's Turn")
-      in_kb, evaluation, move = find_move(board, depth, white, kb, moves)
+      in_kb, evaluation, move = find_move(board, depth, white, kb)
       if using_kb and not in_kb:
         using_kb = False
         kb = None
       print(f'Move: {move} (evaluation {evaluation})')
 
     board.push(move)
-    moves.append(move)
 
     # After any move, the board is displayed.
     display_board(board, flipped=not white)
