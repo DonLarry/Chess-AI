@@ -1,3 +1,4 @@
+import os
 import random
 import time
 from typing import List, Tuple, Optional
@@ -12,15 +13,22 @@ from .knowledge_base import Kb
 
 try:
   import IPython
+  from IPython.display import clear_output
   def display_board(board, *args, size=390, **kwargs):
     """Displays a board drawn as an SVG."""
     svg = chess.svg.board(board, *args, size=size, **kwargs)
     display(IPython.display.HTML(svg))
 except ModuleNotFoundError:
-  def display_board(board, *args, **kwargs):
+  def display_board(board, *args, flipped, **kwargs):
     """Displays a board drawn as an ascii representation."""
     del args, kwargs
-    print(board)
+    if flipped:
+      board = board.transform(chess.flip_vertical)
+      board = board.transform(chess.flip_horizontal)
+    print(board.unicode(empty_square='.'))
+  
+  def clear_output():
+    os.system('cls||clear')
 
 
 def find_move(board, depth, white, kb: Optional[Kb]=None) -> Tuple[bool, int, Move]:
@@ -36,15 +44,18 @@ def find_move(board, depth, white, kb: Optional[Kb]=None) -> Tuple[bool, int, Mo
   return False, evaluation, move
 
 
-def play(white=bool(random.getrandbits(1)), depth=3):
+def play(white=None, depth=3):
   """Creates a game simulation with the engine."""
+
+  if white is None:
+    white = bool(random.getrandbits(1))
 
   board = chess.Board()
   kb = Kb()
   turn = 0 if white else 1
   using_kb = True
   display_board(board, flipped=not white)
-  
+
   while True:
 
     # Checks whether the game has ended and, if it has, shows the cause.
@@ -63,13 +74,15 @@ def play(white=bool(random.getrandbits(1)), depth=3):
       if move not in board.legal_moves:
         print("Invalid move.")
         continue
+      clear_output()
     else:
       print("Computer's Turn")
       in_kb, evaluation, move = find_move(board, depth, white, kb)
       if using_kb and not in_kb:
         using_kb = False
         kb = None
-      print(f'Move: {move} (evaluation {evaluation})')
+      clear_output()
+      print(f"Computer's move: {move} (evaluation {evaluation})")
 
     board.push(move)
 
