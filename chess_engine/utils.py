@@ -41,7 +41,7 @@ def find_move(board, depth, white, kb: Optional[Kb]=None) -> Tuple[bool, int, Mo
 
   evaluation, moves = minimax(board, depth, white=not white)
   move = random.choice(moves)
-  return False, evaluation, move
+  return False, evaluation, move, moves
 
 
 def play(white=None, depth=3):
@@ -77,7 +77,8 @@ def play(white=None, depth=3):
       clear_output()
     else:
       print("Computer's Turn")
-      in_kb, evaluation, move = find_move(board, depth, white, kb)
+      in_kb, evaluation, move, moves = find_move(board, depth, white, kb)
+      print(moves)
       if using_kb and not in_kb:
         using_kb = False
         kb = None
