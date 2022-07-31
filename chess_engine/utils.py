@@ -54,9 +54,12 @@ def find_move(board, depth, white, kb: Optional[Kb]=None, estimate_chances = Fal
   if estimate_chances:
     chances = estimate_play_chances(moves, evaluations, not white)
     if chances:
-      print("Moves with utilities:")
-      for move, chance in chances:
-        print("{}: {} ".format(move, chance))
+      total_chance = sum([chance for _, chance in chances])
+      valid = not total_chance > 100
+      if valid:
+        print("Possible rival moves:")
+        for move, chance in chances:
+          print("{}: {} ".format(move, chance))
   
   best_evaluation = evaluations[0]
   size = evaluations.count(best_evaluation)
@@ -95,9 +98,9 @@ def estimate_play_chances(moves: Tuple[Move, ...], evaluations: Tuple[int, ...],
   if total_utility == 0:
     return []
 
-  print("Total utility: {}".format(total_utility))
-  print("Floor: {}".format(plays_floor))
-  return [(move, utility) for move, utility in results if utility > 0]
+  # print("Total utility: {}".format(total_utility))
+  # print("Floor: {}".format(plays_floor))
+  return [(move, utility / total_utility * 100) for move, utility in results if utility > 0]
 
 
 def evaluations_floor(evaluations: Tuple[int, ...], white: bool = True):
