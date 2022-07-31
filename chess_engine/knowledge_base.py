@@ -1,5 +1,5 @@
 from random import choice
-from typing import List, Optional
+from typing import Tuple, Optional
 
 from pyswip import Prolog
 from chess import Move
@@ -74,7 +74,10 @@ class Kb:
 
     self.prolog = prolog
 
-  def find_move(self, position: str) -> Optional[Move]:
+  def find_moves(self, position: str) -> Tuple[Move]:
     query = f"play('{position}', Move)"
-    options = [result['Move'] for result in self.prolog.query(query)]
+    return tuple(Move.from_uci(result['Move']) for result in self.prolog.query(query))
+
+  def find_move(self, position: str) -> Optional[Move]:
+    options = self.find_moves(position)
     return Move.from_uci(choice(options)) if options else None
