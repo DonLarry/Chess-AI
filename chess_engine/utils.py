@@ -1,5 +1,6 @@
 import os
 import random
+from random import choice
 import time
 from typing import List, Tuple, Optional
 
@@ -31,17 +32,28 @@ except ModuleNotFoundError:
     os.system('cls||clear')
 
 
+def find_moves(board, depth, white, kb: Optional[Kb]=None) -> Tuple[bool, Tuple[int, ...], Tuple[Move, ...]]:
+  """Finds the best possible moves using a Knowledge Base if possible, or the minimax algorithm otherwise."""
+
+  if kb:
+    moves = kb.find_moves(board.fen())
+    if moves:
+      evaluations = (0,) * len(moves)
+      return True, evaluations, moves
+
+  evaluations, moves = zip(*minimax(board, depth, white=not white))
+  return False, evaluations, moves
+
+
 def find_move(board, depth, white, kb: Optional[Kb]=None) -> Tuple[bool, int, Move]:
   """Finds the best possible move using a Knowledge Base if possible, or the minimax algorithm otherwise."""
 
-  if kb:
-    move = kb.find_move(board.fen())
-    if move:
-      return True, 0, move
+  using_kb, evaluations, moves = find_moves(board, depth, white, kb)
+  
+  best_evaluation = evaluations[0]
+  size = evaluations.count(best_evaluation)
 
-  evaluation, moves = minimax(board, depth, white=not white)
-  move = random.choice(moves)
-  return False, evaluation, move
+  return using_kb, best_evaluation, choice(moves[:size])
 
 
 def play(white=None, depth=3):
