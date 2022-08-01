@@ -80,4 +80,4 @@ class Kb:
 
   def find_move(self, position: str) -> Optional[Move]:
     options = self.find_moves(position)
-    return Move.from_uci(choice(options)) if options else None
+    return choice(options) if options else None

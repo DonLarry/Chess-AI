@@ -107,4 +107,4 @@ def minimax(board, depth=3, alpha=-10000, beta=10000, white=True) -> List[Tuple[
       break
 
   evaluations_and_moves = zip(evaluations, legal_moves)
-  return sorted(evaluations_and_moves, reverse=True, key=lambda t: t[0])
+  return sorted(evaluations_and_moves, reverse=white, key=lambda t: t[0])
