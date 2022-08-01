@@ -1,5 +1,7 @@
 import os
 import random
+from random import choice
+from shutil import move
 import time
 from typing import List, Tuple, Optional
 
@@ -31,20 +33,67 @@ except ModuleNotFoundError:
     os.system('cls||clear')
 
 
+def find_moves(board, depth, white, kb: Optional[Kb]=None) -> Tuple[bool, Tuple[int, ...], Tuple[Move, ...]]:
+  """Finds the best possible moves using a Knowledge Base if possible, or the minimax algorithm otherwise."""
+
+  if kb:
+    moves = kb.find_moves(board.fen())
+    if moves:
+      evaluations = (0,) * len(moves)
+      return True, evaluations, moves
+
+  evaluations, moves = zip(*minimax(board, depth, white=not white))
+  return False, evaluations, moves
+
+
 def find_move(board, depth, white, kb: Optional[Kb]=None) -> Tuple[bool, int, Move]:
   """Finds the best possible move using a Knowledge Base if possible, or the minimax algorithm otherwise."""
 
-  if kb:
-    move = kb.find_move(board.fen())
-    if move:
-      return True, 0, move
+  using_kb, evaluations, moves = find_moves(board, depth, white, kb)
+  
+  best_evaluation = evaluations[0]
+  size = evaluations.count(best_evaluation)
 
-  evaluation, moves = minimax(board, depth, white=not white)
-  move = random.choice(moves)
-  return False, evaluation, move
+  return using_kb, best_evaluation, choice(moves[:size])
 
 
-def play(white=None, depth=3):
+def estimate_moves(
+    board,
+    depth,
+    white,
+    kb: Optional[Kb]=None,
+    decimals: int=2,
+    limit: Optional[int]=None
+  ) -> Tuple[bool, Tuple[int, ...], Tuple[Move, ...], int]:
+  """Calculates a percentual estimation of movements to be played for another player."""
+
+  assert(limit is None or (type(limit) is int and limit > 0))
+
+  using_kb, evaluations, moves = find_moves(board, depth, white, kb)
+
+  # Normalization 1st step.
+  if not white:
+    evaluations = list(map(lambda x: -x, evaluations))
+
+  worst_evaluation = evaluations[-1]
+  size = len(evaluations)
+  
+  # If all the elements are the same, then return all the movements with the same probability
+  if size == evaluations.count(worst_evaluation):
+    return using_kb, (100/size,) * size, moves, size
+
+  # Calculate the total evaluation
+  total_evaluation = sum(evaluations) - worst_evaluation * size
+  total_evaluation /= 100
+
+  # Normalization 2nd step (by substracting), and calculating estimations by dividing.
+  # (there's not gonna be negative values, and the worst move is gonna be impossible to do)
+  estimations = tuple(map(lambda x: round((x-worst_evaluation)/total_evaluation, decimals), evaluations))
+
+  return using_kb, estimations[:limit], moves[:limit], size
+
+
+def play(white=None, depth=3, estimation_limit=5):
   """Creates a game simulation with the engine."""
 
   if white is None:
@@ -81,10 +130,17 @@ def play(white=None, depth=3):
       if using_kb and not in_kb:
         using_kb = False
         kb = None
-      clear_output()
       print(f"Computer's move: {move} (evaluation {evaluation})")
 
     board.push(move)
+
+    if turn & 1:
+      _, estimations, moves, total = estimate_moves(board, depth, not white, kb, limit=estimation_limit)
+      size = min(estimation_limit, total)
+      clear_output()
+      print(f'Estimations [{size}/{total}]:' if estimation_limit else 'Estimations:')
+      for i in range(len(moves)):
+        print(f'\t{moves[i]}: {estimations[i]}%')
 
     # After any move, the board is displayed.
     display_board(board, flipped=not white)
