@@ -52,14 +52,14 @@ def find_move(board, depth, white, kb: Optional[Kb]=None, estimate_chances = Fal
 
   # Rival play chances are estimated
   if estimate_chances:
-    chances = estimate_play_chances(moves, evaluations, not white)
+    chances = estimate_play_chances(moves, evaluations, white)
     if chances:
       total_chance = sum([chance for _, chance in chances])
       valid = not total_chance > 100
       if valid:
         print("Possible rival moves:")
         for move, chance in chances:
-          print("{}: {} ".format(move, chance))
+          print("{}: {} %".format(move, chance))
   
   best_evaluation = evaluations[0]
   size = evaluations.count(best_evaluation)
