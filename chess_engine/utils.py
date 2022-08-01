@@ -130,7 +130,6 @@ def play(white=None, depth=3, estimation_limit=5):
       if using_kb and not in_kb:
         using_kb = False
         kb = None
-      clear_output()
       print(f"Computer's move: {move} (evaluation {evaluation})")
 
     board.push(move)
@@ -138,6 +137,7 @@ def play(white=None, depth=3, estimation_limit=5):
     if turn & 1:
       _, estimations, moves, total = estimate_moves(board, depth, not white, kb, limit=estimation_limit)
       size = min(estimation_limit, total)
+      clear_output()
       print(f'Estimations [{size}/{total}]:' if estimation_limit else 'Estimations:')
       for i in range(len(moves)):
         print(f'\t{moves[i]}: {estimations[i]}%')
